@@ -2,6 +2,10 @@ import './App.css';
 import { useRef, useEffect, useState } from 'react';
 import { Wrapper } from "@googlemaps/react-wrapper";
 import App2 from './App2';
+import DecisionButton from './weatherAPI';
+import WeatherRule from './WeatherRule';
+import WeatherContent from './WeatherContent';
+import WeatherStuff from './WeatherStuff';
 
 const MyApp = () => (
   <Wrapper apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEYS} libraries={["places"]}>
@@ -20,6 +24,7 @@ function MyMapComponent(
     });
   const [zoom, setZoom] = useState(JSON.parse(localStorage.getItem('last-time-zoom')) || 8)
   const [saveList, setSaveList] = useState(JSON.parse(localStorage.getItem('my-save-list')) || [])
+  const [theChosenId, setTheChosenId] = useState("")
 
 
   const mapRef = useRef();
@@ -49,13 +54,17 @@ function MyMapComponent(
   }
 
   function handlePositionClick() {
+    console.log('正在取得定位')
     navigator.geolocation.getCurrentPosition(PositionHandler, errorHandler);
-    console.log('取得定位')
+    console.log('已完成')
   }
 
   function handleSaveClick() {
-    setSaveList(saveList.concat(selectedRestaurant))
-
+    if (selectedRestaurant) {
+      setSaveList(saveList.concat(selectedRestaurant))
+    } else {
+      console.log('請選擇餐廳再儲存喔🥰')
+    }
   }
 
   function handleDeleteClick(e) {
@@ -65,12 +74,18 @@ function MyMapComponent(
 
 
   function MySaveList() {
-    const listItems = saveList.map(saveItem =>
-      <li id={saveItem.placeId} key={saveItem.placeId} className='flex justify-between'>
+    const listItems = saveList.map(saveItem => {
+      if (saveItem.placeId === theChosenId) {
+        return <li id={saveItem.placeId} key={saveItem.placeId} className='flex justify-between bg-fuchsia-200'>
+          <b>{saveItem.name}</b>
+          <button onClick={handleDeleteClick}>❌</button>
+        </li>
+      }
+      return <li id={saveItem.placeId} key={saveItem.placeId} className='flex justify-between'>
         <b>{saveItem.name}</b>
         <button onClick={handleDeleteClick}>❌</button>
       </li>
-    );
+    });
     return <ul className=' bg-slate-100 divide-y-2 divide-gray-100'> {listItems}</ul >;
   }
 
@@ -182,10 +197,13 @@ function MyMapComponent(
   }
   );
 
+  const decisionButtonStyleClass = 'hover:text-teal-50 hover:bg-slate-400 rounded max-h-9 text-sm py-2 px-4 min-w-fit border'
+
+
   return (
     <>
       <div className='h-screen w-1/2 p-10'>
-        <h1 className='text-3xl mt-4 '>附近的餐廳😎
+        <h1 className='text-3xl mt-4 '>決定要吃什麼？
         </h1>
         <button
           className="m-4 bg-slate-50 text-gray-600 hover:text-teal-50 hover:bg-slate-400 shadow-sm font-semibold rounded max-h-9 text-sm py-2 px-4 min-w-fit border"
@@ -196,7 +214,18 @@ function MyMapComponent(
         <div className='rounded-lg shadow-lg'>
           <h2 className='text-xl m-2'>儲存清單💫</h2>
           <MySaveList />
-          <App2 />
+          {/* <div className='bg-emerald-50'>以天氣決定！
+            <br />
+            <WeatherRule className={decisionButtonStyleClass} />
+            <DecisionButton className={decisionButtonStyleClass} saveList={saveList} theChosenId={theChosenId}
+              setTheChosenId={setTheChosenId} townNum={0} />
+            <DecisionButton className={decisionButtonStyleClass} saveList={saveList} theChosenId={theChosenId}
+              setTheChosenId={setTheChosenId} townNum={2} />
+          </div> */}
+          <div>
+            <WeatherStuff decisionButtonStyleClass={decisionButtonStyleClass} saveList={saveList} setTheChosenId={setTheChosenId}></WeatherStuff>
+            <App2 />
+          </div>
         </div>
       </div>
       <div ref={mapRef} id="map" className='h-screen w-1/2' />
