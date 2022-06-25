@@ -15,7 +15,7 @@ function DecisionButton({ saveList, setTheChosenId, townNum, className, showWhat
         setIsLoading(true);
 
         try {
-            const response = await fetch('https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0001-001?Authorization=CWB-706D15C2-7D17-40D4-BE45-30F25569F02B&limit=25&offset=0&format=JSON&stationId=C0E820,C0E610,C0D670,C0S660&elementName=TEMP,HUMD,H_24R&parameterName=CITY,TOWN', {
+            const response = await fetch(`https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0001-001?Authorization=${process.env.REACT_APP_WEATHER_API_KEYS}&limit=25&offset=0&format=JSON&stationId=C0E820,C0E610,C0D670,C0S660&elementName=TEMP,HUMD,H_24R&parameterName=CITY,TOWN`, {
                 method: 'GET',
                 headers: {
                     Accept: 'application/json',

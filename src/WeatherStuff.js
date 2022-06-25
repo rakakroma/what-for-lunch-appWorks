@@ -14,7 +14,7 @@ export default function WeatherStuff({ saveList, setTheChosenId, decisionButtonS
     }
 
     return (
-        <div className='bg-emerald-50'>以現在天氣決定！
+        <div className='bg-emerald-50'>以現在的天氣
             <br />
             <WeatherRule onClick={handleShowRuleClick} showWhat={showWhat} className={decisionButtonStyleClass} />
             <DecisionButton className={decisionButtonStyleClass} saveList={saveList} showWhat={showWhat} setShowWhat={setShowWhat}
