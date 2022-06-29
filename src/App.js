@@ -3,7 +3,7 @@ import { useRef, useEffect, useState } from 'react';
 import { Wrapper } from "@googlemaps/react-wrapper";
 import App2 from './App2';
 import DecisionButton from './weatherAPI';
-import WeatherRule from './WeatherRule';
+import WeatherRuleButton from './WeatherRuleButton';
 import WeatherContent from './WeatherContent';
 import WeatherStuff from './WeatherStuff';
 
@@ -214,14 +214,6 @@ function MyMapComponent(
         <div className='rounded-lg shadow-lg'>
           <h2 className='text-xl m-2'>儲存清單💫</h2>
           <MySaveList />
-          {/* <div className='bg-emerald-50'>以天氣決定！
-            <br />
-            <WeatherRule className={decisionButtonStyleClass} />
-            <DecisionButton className={decisionButtonStyleClass} saveList={saveList} theChosenId={theChosenId}
-              setTheChosenId={setTheChosenId} townNum={0} />
-            <DecisionButton className={decisionButtonStyleClass} saveList={saveList} theChosenId={theChosenId}
-              setTheChosenId={setTheChosenId} townNum={2} />
-          </div> */}
           <div>
             <WeatherStuff decisionButtonStyleClass={decisionButtonStyleClass} saveList={saveList} setTheChosenId={setTheChosenId}></WeatherStuff>
             <App2 />
