@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/what-for-lunch-appWorks/static/css/main.388646f4.css",
+    "main.js": "/what-for-lunch-appWorks/static/js/main.838de1aa.js",
+    "index.html": "/what-for-lunch-appWorks/index.html",
+    "main.388646f4.css.map": "/what-for-lunch-appWorks/static/css/main.388646f4.css.map",
+    "main.838de1aa.js.map": "/what-for-lunch-appWorks/static/js/main.838de1aa.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.388646f4.css",
+    "static/js/main.838de1aa.js"
+  ]
+}
