@@ -33,7 +33,6 @@ function DecisionButton({ saveList, setTheChosenId, townNum, className, showWhat
     const handleDecisionClick = async () => {
         // setIsLoading(true);
 
-        console.log(showWhat)
         if (showWhat === `Town${townNum}`) {
             setShowWhat("")
             return <button onClick={handleDecisionClick} className={className}>用<b>{townList[townNum]}</b>的天氣決定！</button>

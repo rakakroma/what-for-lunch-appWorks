@@ -1,11 +1,9 @@
 import './App.css';
 import { useRef, useEffect, useState } from 'react';
 import { Wrapper } from "@googlemaps/react-wrapper";
-import App2 from './App2';
-import DecisionButton from './weatherAPI';
-import WeatherRuleButton from './WeatherRuleButton';
-import WeatherContent from './WeatherContent';
 import WeatherStuff from './WeatherStuff';
+import LoadingMessage from './LoadingMessage';
+import ClickStuff from './ClickStuff';
 
 const MyApp = () => (
   <Wrapper apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEYS} libraries={["places"]}>
@@ -25,11 +23,14 @@ function MyMapComponent(
   const [zoom, setZoom] = useState(JSON.parse(localStorage.getItem('last-time-zoom')) || 8)
   const [saveList, setSaveList] = useState(JSON.parse(localStorage.getItem('my-save-list')) || [])
   const [theChosenId, setTheChosenId] = useState("")
+  const [loadingPosition, setLoadingPosition] = useState("")
 
 
   const mapRef = useRef();
 
   const inputRef = useRef();
+
+  const positionInputRef = useRef();
 
   let currentPosition = {
     lat: 24.245,
@@ -38,25 +39,27 @@ function MyMapComponent(
 
 
   function PositionHandler(position) {
-    console.log(position)
+    // console.log(position)
     currentPosition = {
       lat: position.coords.latitude,
       lng: position.coords.longitude,
     };
     setZoom(14);
     setCenter(currentPosition);
-
+    setLoadingPosition("success")
+    console.log("已取得定位 ")
   }
 
   function errorHandler(err) {
     console.log(err);
-    alert('無法取得定位。您可能未開啟權限或瀏覽器不支援。')
+    setLoadingPosition("error")
+    // alert('無法取得定位。您可能未開啟權限或瀏覽器不支援。')
   }
 
   function handlePositionClick() {
     console.log('正在取得定位')
+    setLoadingPosition("loading")
     navigator.geolocation.getCurrentPosition(PositionHandler, errorHandler);
-    console.log('已完成')
   }
 
   function handleSaveClick() {
@@ -108,6 +111,9 @@ function MyMapComponent(
   let directionsService;
   let directionsRenderer;
   let infoWindow;
+  let selectedPlace;
+
+
 
   useEffect(() => {
     const map = new window.google.maps.Map(mapRef.current, {
@@ -126,7 +132,33 @@ function MyMapComponent(
       },
       strictBounds: false,
     })
+    //用搜尋定位
+    const searchPositionAutocomplete = new window.google.maps.places.Autocomplete(positionInputRef.current, {
+      bounds: {
+        east: boundPosition.lng() + 2,
+        west: boundPosition.lng() - 2,
+        south: boundPosition.lat() - 2,
+        north: boundPosition.lat() + 2,
+      },
+      strictBounds: false,
+    })
+    searchPositionAutocomplete.addListener('place_changed', function () {
+      const searchPositionPlace = searchPositionAutocomplete.getPlace();
+      selectedPlace = {
+        location: searchPositionPlace.geometry.location,
+        placeId: searchPositionPlace.place_id,
+        name: searchPositionPlace.name,
+        address: searchPositionPlace.formatted_address,
+      };
+      console.log(selectedPlace.location)
 
+      map.setCenter(searchPositionPlace.location);
+      setCenter({ lat: selectedPlace.location.lat(), lng: selectedPlace.location.lng() })
+      setZoom(14)
+      setLoadingPosition("success")
+    })
+
+    //
     autocomplete.addListener('place_changed', function () {
       const place = autocomplete.getPlace();
       console.log(place)
@@ -141,6 +173,7 @@ function MyMapComponent(
       };
 
       map.setCenter(selectedRestaurant.location);
+
 
       if (!marker) {
         marker = new window.google.maps.Marker({
@@ -205,19 +238,22 @@ function MyMapComponent(
       <div className='h-screen w-1/2 p-10'>
         <h1 className='text-3xl mt-4 '>決定要吃什麼？
         </h1>
+        <LoadingMessage loadingPosition={loadingPosition} setLoadingPosition={setLoadingPosition} />
         <button
           className="m-4 bg-slate-50 text-gray-600 hover:text-teal-50 hover:bg-slate-400 shadow-sm font-semibold rounded max-h-9 text-sm py-2 px-4 min-w-fit border"
-          onClick={handlePositionClick}>取得定位資訊</button>
-
-        <input ref={inputRef} className='w-1/2 m-2 border h-10 border-b-teal-700' placeholder=" 我想找..　(*´Д｀)" />
-        <button className='hover:bg-teal-400 p-2' onClick={handleSaveClick}>💾 Save</button>
+          onClick={handlePositionClick}>自動取得定位資訊</button> 或
+        <input className='w-3/5' ref={positionInputRef} placeholder="我想用地圖搜尋來定位..." />
+        <input ref={inputRef} className='w-1/2 m-2 border h-10 border-b-teal-700' placeholder=" 我想找吃的..　(*´Д｀)" />
+        <button className='hover:bg-teal-400 p-2' onClick={handleSaveClick}> 儲存到清單 💾</button>
         <div className='rounded-lg shadow-lg'>
-          <h2 className='text-xl m-2'>儲存清單💫</h2>
+          <h2 className='text-xl m-2'>餐廳清單💫<em className='text-sm'> 目前共儲存 {saveList.length} 個地點</em></h2>
           <MySaveList />
-          <div>
-            <WeatherStuff decisionButtonStyleClass={decisionButtonStyleClass} saveList={saveList} setTheChosenId={setTheChosenId}></WeatherStuff>
-            <App2 />
-          </div>
+        </div>
+
+        <div className='mt-5'>
+          <WeatherStuff decisionButtonStyleClass={decisionButtonStyleClass} saveList={saveList} setTheChosenId={setTheChosenId}></WeatherStuff>
+          <ClickStuff saveList={saveList} setTheChosenId={setTheChosenId} />
+          {/* <App2 /> */}
         </div>
       </div>
       <div ref={mapRef} id="map" className='h-screen w-1/2' />
