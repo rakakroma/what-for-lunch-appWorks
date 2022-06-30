@@ -1,9 +1,9 @@
 
 import { useEffect, useState } from "react"
 
-export default function ClickStuff({ saveList, setTheChosenId }) {
+export default function ClickStuff({ clickTimeSum, setClickTimeSum, saveList, setTheChosenId }) {
     const [countdownLeft, setCountdownLeft] = useState(0)
-    const [clickTimeSum, setClickTimeSum] = useState(0)
+    // const [clickTimeSum, setClickTimeSum] = useState(0)
 
 
 
@@ -31,13 +31,34 @@ function ClickArea({ countdownLeft, setCountdownLeft, setClickTimeSum, clickTime
     }
 
     if (countdownLeft > 0) {
-        return <button className="bg-yellow-300 active:bg-red-300" onClick={clickTimeHandler}>CLICK ME!</button>
+        return <div className="flex fixed inset-0 z-20 w-screen h-screen bg-opacity-50 bg-slate-300">
+            <div className="m-auto bg-white p-5 ">
+                <button className="bg-yellow-300 active:bg-red-300" onClick={clickTimeHandler}>CLICK ME!</button>
+            </div>
+        </div>;
     } else {
         return
     }
 }
 
 function ClickResult({ setCountdownLeft, countdownLeft, clickTimeSum, setClickTimeSum, saveList, setTheChosenId }) {
+
+    const [hideClickResult, setHideClickResult] = useState(false)
+
+    // useEffect(() => {
+    //     if (clickTimeSum > 0 && countdownLeft === 0) {
+    //         const timeout = setTimeout(() => {
+    //             setHideClickResult(true)
+    //             console.log("結束")
+    //         }, 4000);
+    //     }
+    // }, [clickTimeSum, setHideClickResult, countdownLeft]);
+
+    if (hideClickResult) {
+        return <button className="p-2 hover:bg-orange-400" onClick={() => setCountdownLeft(3)}>開始</button>
+    }
+
+
     if (countdownLeft === 0 && clickTimeSum === 0) {
         return <button className="p-2 hover:bg-orange-400" onClick={() => setCountdownLeft(3)}>開始</button>
 
@@ -55,15 +76,12 @@ function ClickResult({ setCountdownLeft, countdownLeft, clickTimeSum, setClickTi
 
 
 
-        return <div>
-            <p>本次點擊次數： {clickTimeSum} </p>
-            <p>結果為：{theChosen.name}</p>
-
-            <button className="bg-red-100 self-end" onClick={() => {
-                setClickTimeSum(0);
-                setTheChosenId("")
-            }}> 放棄？ </button>
-
-        </div >
+        return <div className="flex fixed inset-0 z-20 w-screen h-screen bg-opacity-50 bg-slate-300">
+            <div className="m-auto bg-white p-5 ">
+                <p>本次點擊次數： {clickTimeSum} </p>
+                <p>結果為：{theChosen.name}</p>
+                <button className="p-3 bg-slate-100" onClick={() => setHideClickResult(true)}>確定</button>
+            </div>
+        </div>;
     }
 }

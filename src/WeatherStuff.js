@@ -27,9 +27,9 @@ export default function WeatherStuff({ saveList, setTheChosenId, decisionButtonS
             <DecisionButton weatherData={weatherData} setWeatherData={setWeatherData} className={decisionButtonStyleClass} saveList={saveList} showWhat={showWhat} setShowWhat={setShowWhat}
                 setTheChosenId={setTheChosenId} townNum={2} />
 
-            <DecisionInfoBlock showWhat={showWhat} >
-                <WeatherContent weatherData={weatherData} townNum={0} saveList={saveList} showWhat={showWhat} />
-                <WeatherContent weatherData={weatherData} townNum={2} saveList={saveList} showWhat={showWhat} />
+            <DecisionInfoBlock showWhat={showWhat} setShowWhat={setShowWhat}>
+                <WeatherContent weatherData={weatherData} townNum={0} saveList={saveList} showWhat={showWhat} setShowWhat={setShowWhat} />
+                <WeatherContent weatherData={weatherData} townNum={2} saveList={saveList} showWhat={showWhat} setShowWhat={setShowWhat} />
             </DecisionInfoBlock>
 
         </div>)

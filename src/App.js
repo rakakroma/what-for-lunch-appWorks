@@ -24,6 +24,7 @@ function MyMapComponent(
   const [saveList, setSaveList] = useState(JSON.parse(localStorage.getItem('my-save-list')) || [])
   const [theChosenId, setTheChosenId] = useState("")
   const [loadingPosition, setLoadingPosition] = useState("")
+  const [clickTimeSum, setClickTimeSum] = useState(0)
 
 
   const mapRef = useRef();
@@ -81,8 +82,10 @@ function MyMapComponent(
       if (saveItem.placeId === theChosenId) {
         return <li id={saveItem.placeId} key={saveItem.placeId} className='flex justify-between bg-fuchsia-200'>
           <b>{saveItem.name}</b>
-          <button onClick={handleDeleteClick}>❌</button>
-        </li>
+          <button className="bg-red-100 self-end" onClick={() => {
+            setClickTimeSum(0);
+            setTheChosenId("")
+          }}> 放棄？ </button>        </li>
       }
       return <li id={saveItem.placeId} key={saveItem.placeId} className='flex justify-between'>
         <b>{saveItem.name}</b>
@@ -230,12 +233,82 @@ function MyMapComponent(
   }
   );
 
+
+  useEffect(() => {
+
+
+
+    if (theChosenId) {
+      const theChosenRestaurant = saveList.find(saveItem => { return saveItem.placeId === theChosenId })
+
+      const map = new window.google.maps.Map(mapRef.current, {
+        center,
+        zoom,
+      });
+
+      map.setCenter(theChosenRestaurant.location);
+
+
+      if (!marker) {
+        marker = new window.google.maps.Marker({
+          map: map
+        });
+      }
+
+      marker.setPosition(theChosenRestaurant.location);
+
+      if (!directionsService) {
+        directionsService = new window.google.maps.DirectionsService();
+      }
+
+      if (!directionsRenderer) {
+        directionsRenderer = new window.google.maps.DirectionsRenderer({
+          map: map,
+        });
+      }
+
+      directionsRenderer.set('directions', null);
+
+      directionsService.route({
+        origin: new window.google.maps.LatLng(
+          center.lat,
+          center.lng,
+        ),
+        destination: {
+          placeId: theChosenRestaurant.placeId,
+        },
+        travelMode: 'DRIVING',
+      },
+        function (response, status) {
+          console.log(response);
+
+          if (status === "OK") {
+            directionsRenderer.setDirections(response);
+
+            if (!infoWindow) {
+              infoWindow = new window.google.maps.InfoWindow();
+            }
+
+            infoWindow.setContent(
+              `<h2 class="text-xl">🍽️ <b> ${theChosenRestaurant.name} </b>🍽️</h2>
+            <div>🗺️ 地址：${theChosenRestaurant.address}</div>
+            <div>📞 電話：${theChosenRestaurant.phoneNumber}</div>
+            <div> 🌟🌟 /評分人數 🤩🤩：${theChosenRestaurant.rating}/${theChosenRestaurant.ratingTotal}</div>              
+            <div>開車預估時間🚗 :${response.routes[0].legs[0].duration.text}</div>
+            `
+            );
+            infoWindow.open(map, marker)
+          }
+        })
+    }
+  }, [theChosenId]);
+
   const decisionButtonStyleClass = 'hover:text-teal-50 hover:bg-slate-400 rounded max-h-9 text-sm py-2 px-4 min-w-fit border'
 
 
   return (
     <>
-      <div className='h-screen w-1/2 p-10'>
+      <div className='h-screen w-1/2 p-10 '>
         <h1 className='text-3xl mt-4 '>決定要吃什麼？
         </h1>
         <LoadingMessage loadingPosition={loadingPosition} setLoadingPosition={setLoadingPosition} />
@@ -252,7 +325,7 @@ function MyMapComponent(
 
         <div className='mt-5'>
           <WeatherStuff decisionButtonStyleClass={decisionButtonStyleClass} saveList={saveList} setTheChosenId={setTheChosenId}></WeatherStuff>
-          <ClickStuff saveList={saveList} setTheChosenId={setTheChosenId} />
+          <ClickStuff clickTimeSum={clickTimeSum} setClickTimeSum={setClickTimeSum} saveList={saveList} setTheChosenId={setTheChosenId} />
           {/* <App2 /> */}
         </div>
       </div>

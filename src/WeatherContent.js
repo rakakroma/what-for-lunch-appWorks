@@ -1,5 +1,5 @@
 
-function WeatherContent({ weatherData, saveList, townNum, showWhat }) {
+function WeatherContent({ weatherData, saveList, townNum, showWhat, setShowWhat }) {
     if (!weatherData) {
         return
     }
@@ -23,7 +23,7 @@ function WeatherContent({ weatherData, saveList, townNum, showWhat }) {
     if (showWhat === `Town${townNum}`) {
         return (<>
             <div>
-                {GetTownData(townNum).locationName}<br />
+                {GetTownData(townNum).locationName}觀測站<br />
                 資料時間：{GetTownData(townNum).observeTime
                 }<br />
                 溫度是{GetTownData(townNum).currentTemperature}℃
@@ -36,17 +36,17 @@ function WeatherContent({ weatherData, saveList, townNum, showWhat }) {
                 {GetTownData(townNum).currentHumidity * 100} +
                 {GetTownData(townNum).rainfallIn24HR * 10}) /
                 {saveList.length}
-                <br />
-                餘數為 {
+                <h1 className="text-xl">               餘數為 {
                     GetTownData(townNum).theRemainder()
-                } !
-                <div>
-                    結果為：{
+                } !</h1>
+                <div className="text-xl">
+                    {
                         GetTownData(townNum).theRemainder() === 0 ?
                             saveList[saveList.length - 1].name :
                             saveList[GetTownData(townNum).theRemainder() - 1].name
                     }
                 </div>
+                <button className="p-3 bg-slate-100" onClick={() => setShowWhat("")}>確定</button>
             </div>
         </>)
     } else {
